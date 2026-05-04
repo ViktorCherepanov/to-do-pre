@@ -1,23 +1,30 @@
 let items = [
-	"Сделать проектную работу",
-	"Полить цветы",
-	"Пройти туториал по Реакту",
-	"Сделать фронт для своего проекта",
-	"Прогуляться по улице в солнечный день",
-	"Помыть посуду",
+  "Сделать проектную работу",
+  "Полить цветы",
+  "Пройти туториал по Реакту",
+  "Сделать фронт для своего проекта",
+  "Прогуляться по улице в солнечный день",
+  "Помыть посуду",
 ];
 
 const listElement = document.querySelector(".to-do__list");
 const formElement = document.querySelector(".to-do__form");
 const inputElement = document.querySelector(".to-do__input");
 
+formElement.addEventListener("submit", saveNewTask)
+
 function loadTasks() {
-  return items;
+  const tasks = JSON.parse(localStorage.getItem("tasks"));
+  if (tasks !== null) {
+    return tasks;
+  } else {
+    return items;
+  }
 }
 
 function createItem(item) {
-	const template = document.getElementById("to-do__item-template");
-	const clone = template.content.querySelector(".to-do__item").cloneNode(true);
+  const template = document.getElementById("to-do__item-template");
+  const clone = template.content.querySelector(".to-do__item").cloneNode(true);
   const textElement = clone.querySelector(".to-do__item-text");
   textElement.textContent = item;
   const deleteButton = clone.querySelector(".to-do__item-button_type_delete");
@@ -27,15 +34,31 @@ function createItem(item) {
   return clone;
 }
 
-function getTasksFromDOM() {
+function saveNewTask(evt) {
+  evt.preventDefault();
+  const textValue = inputElement.value;
+  listElement.prepend(createItem(textValue));
+  items = getTasksFromDOM();
+  saveTasks(items);
+  inputElement.value = "";
+}
 
+function getTasksFromDOM() {
+  const itemsNamesElements = document.querySelectorAll(".to-do__item-text");
+  let tasks = [];
+  itemsNamesElements.forEach(element => {
+    tasks.push(element.textContent);
+  })
+
+  return tasks;
 }
 
 function saveTasks(tasks) {
-
+  localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
 items = loadTasks();
 items.forEach(item => {
   listElement.append(createItem(item));
 })
+saveTasks(items);
